@@ -1,0 +1,166 @@
+﻿@{
+    ViewBag.Title = "Welcome to Intuit Anywhere";
+    string FriendlyName = (string)HttpContext.Current.Session["FriendlyName"] + "";
+    string FriendlyEmail = (string)HttpContext.Current.Session["FriendlyEmail"];
+    string FriendlyIdentifier = (string)HttpContext.Current.Session["FriendlyIdentifier"];
+
+    string realm = (string)Session["realm"];
+    string dataSource = (string)Session["dataSource"];
+    string accessToken = (string)Session["accessToken"] + "";
+    string accessTokenSecret = (string)Session["accessTokenSecret"];
+    string invalidAccessToken = (string)Session["InvalidAccessToken"];
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<p>
+    <h2>@ViewBag.Message</h2>
+
+
+<!-- MARKUP Written for Demonstration Purpose Only -->
+<!-- OpenId Related HTML -->
+@if (FriendlyName.Length == 0)
+{
+    <div id="signininfo">
+        <ipp:login href="/OpenId/index"></ipp:login>
+        <br />
+    </div>
+}
+else
+{
+    <div id="IntuitInfo">
+        @*<strong>Open Id Information:</strong><br />
+        Welcome: @FriendlyName<br />
+        E-mail Address: @FriendlyEmail<br />
+        Friendly Identifier: @FriendlyIdentifier<br />*@
+        <br />
+        @if (accessToken.Length > 0 && invalidAccessToken == null)
+        {
+            <div id="oAuthinfo">
+                @*<a href="/QuickBooksCustomers" id="QBCustomers">Get QuickBooks Customer List</a><br />*@
+                <br />
+                <br />
+                <a href="#" id="Disconnect" onclick="confirmPost('/Disconnect/Index');" class="btn btn-danger">
+                    Disconnect from
+                    QuickBooks
+                </a><br />
+            </div>
+            //////////////////////////////////////////Customize code//////////////////////////////////////////////
+
+            <div class="entry-tab">
+                <span>@Html.Label("Invoice No#:")</span>
+                <span>
+                    <input type="number" id="doc_no" class="form-control" placeholder="Invoice No.#" /> <br />
+                </span>
+                <span>
+                    <input type="button" id="Getdata" value="Get Data" class="btn btn-success" style="background:none repeat scroll 0 0 #2563ae; color:#fff" />
+                </span>
+            </div>
+            <br />
+            <br />
+            @*@Html.Action("_InvoicePartial","Home")*@
+            <div id="spinner" style="text-align :center;display:none">
+                <img src="~/Images/spinner.gif" width="100" />
+
+                <strong style="opacity:0.4">Invocice is loading,Please wait..</strong>
+            </div>
+
+            <div id="invoiceview" style="clear:both">
+
+            </div>
+
+
+        }
+        else
+        {
+            <br />
+            <ipp:connecttointuit></ipp:connecttointuit>
+        }
+    </div>
+}
+<!-- OpenId Related HTML ends here -->
+</p>
+
+@section Scripts{
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+            $('#doc_no').focus();
+
+            var enterkey = function () {
+                var value = $('#doc_no').val();
+                if (value == '')
+                    alert('Please enter Invoice No.')
+                else {
+                    $.ajax({
+
+                        url: '@Url.Action("Index", "QuickBooksCustomers")',
+                        data: { DocNum: value },
+                        datatype: "",
+                        type: "Get",
+                        beforeSend: function () {
+                            $('#spinner').show();
+                            $('#invoiceview').hide()
+                        },
+                        success: function (data) {
+                            $('#invoiceview').html(data),
+                            $('#spinner').hide();
+                            $('#invoiceview').show()
+                        },
+                        error: function (jqXHR, error, errorThrown) {
+                            $('#invoiceview').html("Invoice not found"),
+                            $('#spinner').hide(),
+                            $('#invoiceview').show();
+                        },
+                    });
+                }
+            };
+
+            $('#Getdata').click(function () {
+                enterkey();
+            });
+
+            $('#doc_no').keypress(function (e) {
+                var key = e.which;
+                if (key == 13)  // the enter key code
+                {
+                    enterkey();
+                }
+            });
+
+            $(document).on("click", "#printbtn", function (e) {
+
+                if ($(":checkbox[name='print']").is(":checked")) {
+
+                    var arr = $(":checkbox[name='print']:checked").map(function (i, el) { return $(el).attr("id"); }).get();
+                    arr.push($("#doc_no").val());
+                    $.ajax({
+                        url: '@Url.Action("print", "QuickBooksCustomers", new { Area = string.Empty })',
+                        data: { array: JSON.stringify(arr) },
+                        type: "Get",
+                        datatype: "Json",
+                        beforeSend: function () { },
+                        success: function (data) {
+                            var w = window.open();
+                            w.document.write(data);
+                            w.window.print();
+                            w.document.close();
+                            w.close();
+                        },
+                        error: function (jqXHR, error, errorThrown) { alert(jqXHR.responseText) }
+                    });
+                }
+                else {
+                    alert("Please select at least one item")
+                }
+            });
+
+
+            
+
+            
+
+        });
+
+    </script>
+}

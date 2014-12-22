@@ -1,0 +1,83 @@
+﻿
+@using Intuit.Ipp.Data;
+
+
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "";
+
+}
+
+
+@{
+
+
+    <h2 class="tittle">Invoice</h2>
+
+    var invoice = (IEnumerable<Invoice>)ViewBag.Invoice;
+
+    var items = invoice.FirstOrDefault().Line.ToList();
+
+    <div style="border:1px solid #0094ff; margin:0 auto; overflow:hidden; padding:5%">
+
+        <h3 class="subtittle">Invoice Header</h3>
+        <table class="table table-bordered table_colored">
+            <thead>
+            <th>Invoice No</th>
+            <th>Created Date</th>
+            <th>Bill Address</th>
+            </thead>
+
+
+
+
+
+            <tr>
+                <td>@invoice.FirstOrDefault().DocNumber</td>
+                <td>@invoice.FirstOrDefault().DueDate.ToShortDateString()</td>
+                <td>@invoice.FirstOrDefault().BillAddr.Line1</td>
+            </tr>
+
+        </table>
+
+        <br />
+        <br />
+        <br />
+
+        <h3 class="subtittle">Invoice Details</h3>
+        <table class="table table-bordered table_colored">
+            <thead>
+            <th>#</th>
+            <th>Product/Service</th>
+            <th>Item Description</th>
+            <th>Item Quantity</th>
+            @*<th>UOM</th>*@
+            <th></th>
+            </thead>
+
+
+
+
+            @foreach (var element in items)
+            {
+
+                if (element.AnyIntuitObject.GetType().ToString() == "Intuit.Ipp.Data.SalesItemLineDetail")
+                {
+                    SalesItemLineDetail ls = new SalesItemLineDetail();
+                    ls = (SalesItemLineDetail)element.AnyIntuitObject;
+
+                    <tr>
+                        <td>@element.Id</td>
+                        <td>@ls.ItemRef.name</td>
+                        <td>@element.Description</td>
+                        <td>@ls.Qty</td>
+                        @*<td>@ls.UOMRef</td>*@
+                        <td>@Html.CheckBox("print", new { id = element.Id, name = "printchk" })</td>
+                    </tr>
+                }
+            }
+        </table>
+        <input type="button" id="printbtn" style="font-size:18px;background:none repeat scroll 0 0 #2563ae; color:#fff" value="Print" class="btn btn-xs btn-success pull-right" />
+
+    </div>
+}

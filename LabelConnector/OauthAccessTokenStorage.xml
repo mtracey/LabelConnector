@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--This xml file persists the Oauth Access token so that user doen't need to go through the approval process all over again.-->
+<oauthtokenstorage>
+  <record usermailid="" encryptedaccesskey="" encryptedaccesskeysecret="" realmid="" dataSource="">
+  </record>
+  <record usermailid="srvemana@imc.com" encryptedaccesskey="k5oWT9Q9GREu9g+xRoi4RfXM9Bm/f/OllE+pgQBeebAlIrRwRg8b8eJPnV0rAJ+IqdUD8s7SlgvjUOcr8acBmKno7tyWdVP2G00M1b4cs7wsf+rAuI4LvoYHwvn5HpRmsSc5Ptj659g=" encryptedaccesskeysecret="lTbnc6Req0AyeNW7kWnk5w+mqL/raZFWD+SgT+8jt13S5KdpqLfobG72k+D4ExI3k9bVsMlnOfHO4xKvYOIG83B8ttsPKVL0lNy8mrBAshGNg6bTPtJaNw==" realmid="1292762900" dataSource="QBO" />
+</oauthtokenstorage>
